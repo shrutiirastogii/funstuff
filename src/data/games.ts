@@ -7,6 +7,18 @@ const games: Game[] = [
     path: '/solar-sizer',
     // image: '/images/solar-sizer.png', // add once you have artwork
   },
+  {
+    name: 'Learn With Pixel',
+    description: 'Learn a new skill in a few minutes.',
+    path: '/learn-with-pixel',
+    // image: '/images/learn-with-pixel.png', // add once you have artwork
+  },
+  {
+    name: 'VibeCheck',
+    description: 'Test your reaction time and color perception.',
+    path: '/vibe-check',
+    // image: '/images/vibe-check.png', // add once you have artwork
+  },
 ];
 
 export default games;
