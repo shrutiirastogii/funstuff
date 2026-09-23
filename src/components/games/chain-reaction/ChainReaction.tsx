@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type GameState, type BlankState } from "./types";
-import { getRandomMockPuzzle } from "./mockPuzzles";
+import { fetchGeneratedPuzzle } from "./api";
 import {
   createBlanks,
   checkBlank,
@@ -10,24 +10,48 @@ import {
   getDisplayWord,
 } from "./engine";
 
-function createInitialState(): GameState {
-  const puzzle = getRandomMockPuzzle();
+function createLoadingState(): GameState {
   return {
-    puzzle,
-    blanks: createBlanks(puzzle),
+    puzzle: null,
+    blanks: [],
     attempts: 0,
     hintsUsed: 0,
     isSolved: false,
-    isLoading: false,
+    isLoading: true,
     error: null,
   };
 }
 
 export default function ChainReaction() {
-  const [state, setState] = useState<GameState>(createInitialState);
+  const [state, setState] = useState<GameState>(createLoadingState);
+
+  const loadNewPuzzle = async () => {
+    setState(createLoadingState());
+    try {
+      const puzzle = await fetchGeneratedPuzzle();
+      setState({
+        puzzle,
+        blanks: createBlanks(puzzle),
+        attempts: 0,
+        hintsUsed: 0,
+        isSolved: false,
+        isLoading: false,
+        error: null,
+      });
+    } catch {
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: "Couldn't load a puzzle. Try again.",
+      }));
+    }
+  };
+
+  useEffect(() => {
+    loadNewPuzzle();
+  }, []);
 
   const { puzzle, blanks } = state;
-  if (!puzzle) return null;
 
   const updateBlank = (index: number, updater: (b: BlankState) => BlankState) => {
     setState((prev) => ({
@@ -41,6 +65,7 @@ export default function ChainReaction() {
   };
 
   const handleCheckAll = () => {
+    if (!puzzle) return;
     setState((prev) => {
       const checked = prev.blanks.map((b) => checkBlank(puzzle, b));
       const solved = isPuzzleSolved(checked);
@@ -54,13 +79,31 @@ export default function ChainReaction() {
   };
 
   const handleHint = (index: number) => {
+    if (!puzzle) return;
     updateBlank(index, (b) => revealHintLetter(puzzle, b));
     setState((prev) => ({ ...prev, hintsUsed: prev.hintsUsed + 1 }));
   };
 
-  const handleNewPuzzle = () => {
-    setState(createInitialState());
-  };
+  if (state.isLoading) {
+    return (
+      <div style={styles.wrap}>
+        <h1>Chain Reaction</h1>
+        <p style={{ color: "#888" }}>Generating a fresh puzzle...</p>
+      </div>
+    );
+  }
+
+  if (state.error || !puzzle) {
+    return (
+      <div style={styles.wrap}>
+        <h1>Chain Reaction</h1>
+        <p style={{ color: "#ef4444", marginBottom: 16 }}>{state.error}</p>
+        <button style={styles.checkBtn} onClick={loadNewPuzzle}>
+          Try again
+        </button>
+      </div>
+    );
+  }
 
   const chainLength = puzzle.chain.length;
 
@@ -119,7 +162,7 @@ export default function ChainReaction() {
         </button>
       )}
 
-      <button style={styles.newPuzzleBtn} onClick={handleNewPuzzle}>
+      <button style={styles.newPuzzleBtn} onClick={loadNewPuzzle}>
         New puzzle
       </button>
     </div>
