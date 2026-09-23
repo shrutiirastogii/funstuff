@@ -3,6 +3,7 @@ import Home from "./components/Home";
 import SolarSizer from "./components/games/solar-sizer/SolarSizer";
 import LearnWithPixel from "./components/games/learn-with-pixel/LearnWithPixel";
 import VibeCheck from "./components/games/vibe-check/VibeCheck";
+import ChainReaction from "./components/games/chain-reaction/ChainReaction";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <Route path= "/solar-sizer" element={<SolarSizer/>} />
       <Route path="/learn-with-pixel" element ={<LearnWithPixel/>}/>
       <Route path="/vibe-check" element = {<VibeCheck/>}/>
+      <Route path="/chain-reaction" element={<ChainReaction />} />
     </Routes>
   );
 }

@@ -19,6 +19,12 @@ const games: Game[] = [
     path: '/vibe-check',
     // image: '/images/vibe-check.png', // add once you have artwork
   },
+    {
+    name: 'ChainReaction',
+    description: 'Guess the word in the chain.',
+    path: '/chain-reaction',
+    // image: '/images/chain-reaction.png', // add once you have artwork
+  },
 ];
 
 export default games;
